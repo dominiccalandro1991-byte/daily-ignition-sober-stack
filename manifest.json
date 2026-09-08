@@ -1,0 +1,9 @@
+{
+  "name": "Rebuild Sober Stack",
+  "short_name": "Rebuild",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a1420",
+  "theme_color": "#0a1420",
+  "icons": [{ "src": "icon.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" }]
+}
