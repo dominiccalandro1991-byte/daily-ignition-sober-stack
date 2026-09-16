@@ -1,0 +1,16 @@
+{
+  "repo": "dominiccalandro1991-byte/daily-ignition-sober-stack",
+  "incomplete": false,
+  "missing_dependencies": [],
+  "required_build_specs": [],
+  "file_count": 7,
+  "root_entries": [
+    ".github",
+    "README.md",
+    "daily-ignition-sober-stack.html",
+    "icon.svg",
+    "index.html",
+    "manifest.json",
+    "sw.js"
+  ]
+}
