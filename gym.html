@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rebuild Gym Lab</title>
+<style>
+:root{--bg:#0a1420;--card:#10202c;--line:rgba(255,255,255,.1);--mut:#9aa3b2;--acc:#2dd4bf;--txt:#eef6f4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;padding:env(safe-area-inset-top) 14px 90px}
+h1{font-size:22px;margin:16px 0 4px}h2{font-size:17px;margin:0 0 6px}.sub{color:var(--mut);font-size:13px}
+.pills{display:flex;gap:8px;overflow:auto;padding:8px 0} .pill{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:8px 12px}
+.pill.on{background:var(--acc);color:#04201c;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px}
+.card.hi{border-color:var(--acc)}
+.zone{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
+label{display:block;font-size:11px;color:var(--mut);margin:8px 0 4px}
+input{width:100%;background:#071018;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 10px;font-size:16px}
+.btn{width:100%;margin-top:10px;background:var(--acc);color:#04201c;border:0;border-radius:12px;padding:12px;font-weight:800}
+.meta{font-size:12px;color:var(--mut);margin-top:8px}
+</style></head><body>
+<h1>Rebuild · Gym Lab</h1>
+<p class="sub" id="focus"></p>
+<div class="pills" id="pills"></div>
+<div id="list"></div>
+<script>
+var NS="rb";
+var FOCUS=[["Cardio Engine Day","Bike, treadmill, row, stairs."],["Arm Strength Day","Curls, press-downs, dumbbells, cables."],["Leg Strength Day","Press, curl, extension, squat pattern."],["Push Day","Chest, shoulders, triceps."],["Pull Day","Lats, rows, rear delts, biceps."],["Full-Body Circuit Day","30-min circuit plus one heavy compound."],["Mobility + Easy Spin Day","Easy bike, stretch, light machines."]];
+var KIND_DAY=["cardio","arms","legs","push","pull","full","recover"];
+var HOME=[["h_statbike","Cardio","Stationary bike","cardio",["minutes","resistance","miles","heart"]],["h_roadbike","Cardio","Regular / outdoor bike","cardio",["minutes","miles","heart"]],["h_walk","Cardio","Walk or hike","cardio",["minutes","miles"]],["h_pushup","Arms","Push-ups","arms",["sets","reps"]],["h_curl","Arms","Dumbbell or band curls","arms",["sets","reps","weight"]],["h_ohp","Arms","Overhead press","arms",["sets","reps","weight"]],["h_row","Pull","Band / backpack row","pull",["sets","reps","weight"]],["h_squat","Legs","Bodyweight squat","legs",["sets","reps"]],["h_lunge","Legs","Split squat / lunge","legs",["sets","reps"]],["h_rdl","Legs","Hip hinge / RDL","legs",["sets","reps","weight"]],["h_calf","Legs","Calf raise","legs",["sets","reps"]],["h_plank","Core","Plank","core",["sets","seconds"]],["h_stretch","Recovery","Stretch / mobility","recover",["minutes"]]];
+var PF=[["pf_tm","Cardio","Treadmill","cardio",["minutes","incline","speed","miles","heart"]],["pf_ell","Cardio","Elliptical","cardio",["minutes","resistance","heart"]],["pf_row","Cardio","Rowing machine","cardio",["minutes","meters","heart"]],["pf_ubike","Cardio","Upright bike","cardio",["minutes","resistance","miles"]],["pf_rbike","Cardio","Recumbent bike","cardio",["minutes","resistance"]],["pf_spin","Cardio","Spin bike","cardio",["minutes","resistance"]],["pf_stair","Cardio","Stair climber / StairMaster","cardio",["minutes","level"]],["pf_arc","Cardio","ARC trainer","cardio",["minutes","resistance"]],["pf_chest","Push","Chest press","push",["sets","reps","weight"]],["pf_fly","Push","Pec fly / rear delt","push",["sets","reps","weight"]],["pf_shp","Push","Shoulder press","push",["sets","reps","weight"]],["pf_tri","Arms","Tricep extension","arms",["sets","reps","weight"]],["pf_bic","Arms","Bicep curl machine","arms",["sets","reps","weight"]],["pf_preach","Arms","Preacher curl","arms",["sets","reps","weight"]],["pf_ez","Arms","EZ / fixed curl bar","arms",["sets","reps","weight"]],["pf_db","Free weights","Dumbbell rack (~75-80 lb)","arms",["sets","reps","weight","move"]],["pf_lat","Pull","Lat pulldown","pull",["sets","reps","weight"]],["pf_srow","Pull","Seated row","pull",["sets","reps","weight"]],["pf_cable","Pull","Cable crossover / dual pulley","pull",["sets","reps","weight","move"]],["pf_grav","Pull","Assisted pull-up / dip","pull",["sets","reps","weight"]],["pf_smith","Compound","Smith machine","full",["sets","reps","weight","move"]],["pf_lpress","Legs","Leg press","legs",["sets","reps","weight"]],["pf_hack","Legs","Hack squat","legs",["sets","reps","weight"]],["pf_lext","Legs","Leg extension","legs",["sets","reps","weight"]],["pf_lcurl","Legs","Seated leg curl","legs",["sets","reps","weight"]],["pf_calf","Legs","Calf raise machine","legs",["sets","reps","weight"]],["pf_abd","Hips","Hip abductor","legs",["sets","reps","weight"]],["pf_add","Hips","Hip adductor","legs",["sets","reps","weight"]],["pf_glute","Legs","Glute / kickback","legs",["sets","reps","weight"]],["pf_circuit","Circuit","30-Minute Express Circuit","full",["minutes","rounds"]],["pf_abs","Core","Abs machine / mat","core",["sets","reps"]]];
+var LABELS={minutes:"Minutes",resistance:"Resistance",miles:"Miles",heart:"Heart rate",incline:"Incline %",speed:"Speed",meters:"Meters",level:"Level",sets:"Sets",reps:"Reps",weight:"Weight (lb)",seconds:"Seconds",rounds:"Rounds",move:"Movement"};
+var pane="focus";
+function key(){return NS+"_stationlog"}
+function log(){try{return JSON.parse(localStorage.getItem(key())||"{}")}catch(e){return {}}}
+function save(x){localStorage.setItem(key(),JSON.stringify(x))}
+function last(id){var a=log()[id]||[];return a[a.length-1]}
+function pr(id,f){var b=0;(log()[id]||[]).forEach(function(r){var v=+r[f];if(v>b)b=v});return b||null}
+function match(st,d){if(d==="full"||d==="recover")return d==="full"?true:(st[3]==="recover"||st[3]==="cardio"||st[3]==="core");if(d==="arms")return st[3]==="arms"||st[3]==="push"||st[3]==="pull";return st[3]===d}
+function card(st,hi){var L=last(st[0]),pw=pr(st[0],"weight"),pm=pr(st[0],"minutes");var h='<div class="card'+(hi?" hi":"")+'"><div class="zone">'+st[1]+'</div><h2>'+st[2]+'</h2>';h+='<div class="meta">'+(L?("Last "+(L.day||"")):"No log yet")+(pw?" · PR "+pw+" lb":"")+(pm?" · "+pm+" min":"")+'</div>';st[4].forEach(function(f){var v=L&&L[f]!=null?L[f]:"";h+='<label>'+LABELS[f]+'</label><input data-id="'+st[0]+'" data-f="'+f+'" value="'+v+'">';});h+='<button class="btn" onclick="saveSt(\''+st[0]+'\')">Save this set</button></div>';return h;}
+function saveSt(id){var rec={t:Date.now(),day:new Date().toISOString().slice(0,10)};document.querySelectorAll('input[data-id="'+id+'"]').forEach(function(i){rec[i.getAttribute("data-f")]=i.value});var L=log();(L[id]=L[id]||[]).push(rec);save(L);render();}
+function render(){var d=new Date().getDay(),focus=FOCUS[d],kind=KIND_DAY[d];document.getElementById("focus").textContent=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d]+" · "+focus[0]+" — "+focus[1];document.getElementById("pills").innerHTML=[["focus","Today"],["home","Home"],["pf","Planet Fitness"],["log","Log"]].map(function(p){return '<div class="pill'+(pane===p[0]?" on":"")+'" onclick="pane=\''+p[0]+'\';render()">'+p[1]+"</div>";}).join("");var html="";if(pane==="focus"){HOME.filter(function(s){return match(s,kind)}).forEach(function(s){html+=card(s,true)});PF.filter(function(s){return match(s,kind)}).forEach(function(s){html+=card(s,true)});}else if(pane==="home"){HOME.forEach(function(s){html+=card(s,match(s,kind))});}else if(pane==="pf"){PF.forEach(function(s){html+=card(s,match(s,kind))});}else{var rows=[],names={};HOME.concat(PF).forEach(function(s){names[s[0]]=s[2]});var L=log();Object.keys(L).forEach(function(id){L[id].forEach(function(r){rows.push({id:id,r:r})})});rows.sort(function(a,b){return b.r.t-a.r.t});html+='<div class="card">'+rows.length+" saved sets on this phone.</div>";rows.slice(0,50).forEach(function(x){html+='<div class="card"><div class="zone">'+(x.r.day||"")+'</div><h2>'+(names[x.id]||x.id)+'</h2><div class="meta">'+JSON.stringify(x.r).replace(/[{}"]/g," ").slice(0,160)+"</div></div>";});}document.getElementById("list").innerHTML=html;}render();
+</script></body></html>
